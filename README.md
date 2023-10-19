@@ -1,5 +1,4 @@
 # Immersive Compass
-
 A Skyrim-style compass for Valheim designed to improve immersion in the game world, based on aedenthorn's original with fixes and QoL additions.
 
 Adds a customizable compass to the game HUD that:
@@ -41,10 +40,7 @@ Unzip the contents to your ``BepInEx\plugins`` folder.
 
 ## Thanks
 
-* Huge thanks go out to [Azumatt](https://valheim.thunderstore.io/package/Azumatt/) (and by extension [blaxxun-boop](https://github.com/blaxxun-boop)) without their videos and template examples none of this would be possible.
-* [Aedenthorn](https://github.com/aedenthorn/ValheimMods) for the original compass mod.
-* [blaxxun-boop](https://github.com/blaxxun-boop) for ServerSync.
-
+* This is a fork of [GuyDeYoYo's ](https://github.com/guydeyoyo)'s [ImmersiveCompass](https://github.com/guydeyoyo/ImmersiveCompass), updated to work with Valheim 0.217.25 thanks to KG. 
 
 ## License
 
@@ -52,6 +48,9 @@ MIT No Attribution
 
 
 ## Changelog
+
+### 1.2.0 
+* Updated to work with Valheim 0.217.25 by updating source code libs and building off latest serversync (according to the mod-commissionee) 
 
 ### 1.1.2
 
