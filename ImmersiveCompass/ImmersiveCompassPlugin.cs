@@ -21,7 +21,7 @@ namespace ImmersiveCompass
     {
         #region Variables
         internal const string PLUGIN_NAME = "ImmersiveCompass";
-        internal const string PLUGIN_VERSION = "1.1.2";
+        internal const string PLUGIN_VERSION = "1.1.3";
         internal const string PLUGIN_GUID = "Yoyo." + PLUGIN_NAME;
         internal const string PLUGIN_AUTHOR = "GuyDeYoyo";
 
@@ -532,7 +532,8 @@ namespace ImmersiveCompass
                 _angle *= -Mathf.Deg2Rad;
 
                 Rect _rectCompass = _objectCompass.GetComponent<Image>().sprite.rect;
-                float _imageScale = GameObject.Find("LoadingGUI").GetComponent<CanvasScaler>().scaleFactor;
+                //float _imageScale = GameObject.Find("LoadingGUI").GetComponent<CanvasScaler>().scaleFactor;
+                float _imageScale = GuiScaler.m_largeGuiScale;
 
                 _objectCompass.GetComponent<RectTransform>().localPosition = Vector3.right * (_rectCompass.width / 2) * _angle / (2f * Mathf.PI) - new Vector3(_rectCompass.width * 0.125f, 0, 0);
 
