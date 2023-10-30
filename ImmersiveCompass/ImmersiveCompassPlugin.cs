@@ -14,6 +14,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static Minimap;
 
+
 namespace ImmersiveCompass
 {
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
@@ -45,7 +46,9 @@ namespace ImmersiveCompass
         private static bool _gotCompassMask = false;
         private static bool _gotCompassCenter = false;
         internal static bool _keyPressed = false;
-        #endregion Variables
+
+
+#endregion Variables
 
 
         #region ServerSync
@@ -72,19 +75,6 @@ namespace ImmersiveCompass
             _scalePins = config("2 - Compass Display", "Scale (Pins)", 1f, "Enlarge or shrink the overall scale of pins.", false);
             _scalePinsMin = config("2 - Compass Display", "Minimum Pin Size", 0.25f, "Enlarge or shrink the scale of the pins at their furthest visible distance.", false);
             _compassShowCenterMark = config("2 - Compass Display", "Show Center Mark", false, "(Optional) Show center mark graphic.", false);
-
-            _configUseAutoRemoveTombstone = config("3 - Auto-Remove Pins", "Tombstone", true, "Auto-remove your own tombstone pin (if it exists) when you interact with the object.", false);
-
-            _configUseRemoveNearby = config("4 - Remove Nearest Pin", "Enabled", true, "Enable or disable the Remove Nearest Pin functionality.", false);
-            _configKeyRemoveNearby = config("4 - Remove Nearest Pin", "Keybind", KeyCode.KeypadMultiply, "Key to press to remove nearest pin from current location.", false);
-            _configModifierRemoveNearby = config("4 - Remove Nearest Pin", "Modifier Key", KeyCode.LeftControl, "(Optional) Modifier key to hold when pressing keybind.", false);
-            _configRemoveNearbyRadius = config("4 - Remove Nearest Pin", "Radius", 8, "Radius from current position to search for nearest pin to remove.", false);
-            _configUseRemoveNearbyBeds = config("4 - Remove Nearest Pin", "Remove Beds", false, "Allow bed pin to be removed.", false);
-            _configUseRemoveNearbyTombstone = config("4 - Remove Nearest Pin", "Remove Tombstones", true, "Allow tombstone pin to be removed.", false);
-
-            _configUseAddAtLocation = config("5 - Add Pin at Location", "Enabled", true, "Enable or disable to Add Pin at Location functionality.", false);
-            _configKeyAddAtLocation = config("5 - Add Pin at Location", "Keybind", KeyCode.KeypadMultiply, "Key to press to add a pin at current location.", false);
-            _configModifierAddAtLocation = config("5 - Add Pin at Location", "Modifier Key", KeyCode.None, "(Optional) Modifier key to hold when pressing keybind.", false);
 
             _ignoredPinNames = config("6 - Ignore", "Pin Names", "Silver,Obsidian,Copper,Tin", "Ignore location pins with these names (comma separated, no spaces). End a string with asterix * to denote a prefix.", true);
             _ignoredPinTypes = config("6 - Ignore", "Pin Types", "Shout,Ping", "Ignore location pins of these types (comma separated, no spaces). Types include: Icon0,Icon1,Icon2,Icon3,Icon4,Death,Bed,Shout,None,Boss,Player,RandomEvent,Ping,EventArea.", true);
@@ -131,150 +121,7 @@ namespace ImmersiveCompass
             _harmony?.UnpatchSelf();
         }
 
-
-        private static bool UseModifierKey = false;
-        private static bool UseModifierAlt = false;
-        private static KeyCode KeyValue = KeyCode.None;
-        private static KeyCode ModifierKey = KeyCode.None;
-        private static KeyCode AltKeyValue = KeyCode.None;
-        private static KeyCode AltModifier = KeyCode.None;
-        internal static bool CheckKeyDown(bool IsRemove)
-        {
-            if ((_configKeyAddAtLocation.Value == _configKeyRemoveNearby.Value) && (_configModifierAddAtLocation.Value == _configModifierRemoveNearby.Value)) return false; // Do not clash.
-
-            KeyValue = IsRemove ? _configKeyRemoveNearby.Value : _configKeyAddAtLocation.Value;
-            UseModifierKey = IsRemove ? (_configModifierRemoveNearby.Value != KeyCode.None ? true : false) : (_configModifierAddAtLocation.Value != KeyCode.None ? true : false);
-            ModifierKey = IsRemove ? _configModifierRemoveNearby.Value : _configModifierAddAtLocation.Value;
-
-            AltKeyValue = IsRemove ? _configKeyAddAtLocation.Value : _configKeyRemoveNearby.Value;
-            UseModifierAlt = IsRemove ? (_configKeyAddAtLocation.Value != KeyCode.None ? true : false) : (_configModifierRemoveNearby.Value != KeyCode.None ? true : false);
-            AltModifier = IsRemove ? _configModifierAddAtLocation.Value : _configModifierRemoveNearby.Value;
-
-            if (KeyValue == AltKeyValue)
-            {
-                if (UseModifierKey && UseModifierAlt)
-                    if (Input.GetKey(AltModifier)) return false;
-                if (!UseModifierKey && UseModifierAlt && KeyValue == AltKeyValue)
-                    if (Input.GetKey(AltModifier)) return false;
-            }
-
-            try
-            {
-                return !UseModifierKey ? Input.GetKeyDown(KeyValue) : (Input.GetKey(ModifierKey) ? Input.GetKeyDown(KeyValue) : false);
-            }
-            catch (Exception e)
-            {
-                ImmersiveCompassLogger.LogError($" Caught exception during CheckKeyDown: {e}");
-                return false;
-            }
-        }
-
-
-        private void Update()
-        {
-            if (!Player.m_localPlayer) return;
-            if (ZInput.instance == null) return;
-            if (_configEnabled.Value != true) return;
-
-            _keyPressed = false;
-
-            #region Add Pin at Location
-            if (_configUseAddAtLocation.Value == true && _configKeyAddAtLocation.Value != KeyCode.None)
-            {
-                try
-                {
-                    if (CheckKeyDown(false))
-                    {
-                        Minimap.instance.AddPin(Player.m_localPlayer.transform.position, PinType.Icon3, string.Empty, true, false, Player.m_localPlayer.GetPlayerID());
-                        Minimap.instance.UpdatePins();
-                        Minimap.instance.Update();
-                        ImmersiveCompassLogger.LogDebug("Added pin at current location.");
-                        _keyPressed = true;
-                    }
-                }
-                catch (Exception e)
-                {
-                    ImmersiveCompassLogger.LogError($"Caught exception when adding pin at current location: {e}");
-                }
-            }
-            #endregion Add Pin at Location
-
-
-            #region Remove Nearest Pin
-            if (_configUseRemoveNearby.Value == true && _configKeyRemoveNearby.Value != KeyCode.None && _configRemoveNearbyRadius.Value > 0)
-            {
-                try
-                {
-                    if (!_keyPressed && CheckKeyDown(true))
-                    {
-                        ImmersiveCompassLogger.LogDebug("Key Pressed for Remove Nearest.");
-                        if (Minimap.instance.m_pins.Count > 0)
-                        {
-                            int _removeRadius = _configRemoveNearbyRadius.Value;
-                            if (_configRemoveNearbyRadius.Value > 10000) _removeRadius = 10000;
-
-                            List<string> PinTypes = new List<string>() { "Icon0", "Icon1", "Icon2", "Icon3", "Icon4" };
-                            if (_configUseRemoveNearbyTombstone.Value) PinTypes.Add("Death");
-                            if (_configUseRemoveNearbyBeds.Value) PinTypes.Add("Bed");
-
-                            PinData NearestPin = Minimap.instance.GetClosestPin(Player.m_localPlayer.transform.position, _removeRadius);
-
-                            if (NearestPin != null)
-                            {
-                                if (PinTypes.Contains(NearestPin.m_type.ToString()))
-                                {
-                                    if (NearestPin.m_ownerID == Player.m_localPlayer.GetPlayerID() || NearestPin.m_ownerID == 0)
-                                    {
-                                        Minimap.instance.RemovePin(NearestPin);
-                                        Minimap.instance.UpdatePins();
-                                        Minimap.instance.Update();
-                                        ImmersiveCompassLogger.LogDebug("Nearest pin removed ({NearestPin.m_type.ToString()}).");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    ImmersiveCompassLogger.LogError($"Caught exception when removing nearest pin: {e}");
-                }
-            }
-            #endregion Remove Nearby Pins
-        }
         #endregion Standard Methods
-
-
-        #region Tombstone Pin Methods
-        [HarmonyPatch(typeof(TombStone), "Interact")]
-        internal static class RemoveMarkerOnInteract
-        {
-            internal static bool Prefix(TombStone __instance)
-            {
-                ImmersiveCompassLogger.LogDebug("Interacted with tombstone.");
-                if (!__instance.IsOwner()) return true;
-                if (_configEnabled.Value != true) return true;
-                if (_configUseAutoRemoveTombstone.Value != true) return true;
-
-                try
-                {
-                    if (Minimap.instance.GetClosestPin(__instance.transform.position, 1) != null)
-                    {
-                        Minimap.instance.RemovePin(Minimap.instance.GetClosestPin(__instance.transform.position, 1));
-                        Minimap.instance.UpdatePins();
-                        Minimap.instance.Update();
-                    }
-                }
-                catch (Exception e)
-                {
-                    ImmersiveCompassLogger.LogDebug($"Caught exception when removing tombstone pin: {e}");
-                }
-
-                return true;
-            }
-        }
-        #endregion Tombstone Pin Methods
-
 
         #region Compass Methods
         [HarmonyPatch(typeof(Hud), "Awake")]
@@ -679,16 +526,16 @@ namespace ImmersiveCompass
         internal static ConfigEntry<bool> _configEnabled = null!;
         internal static ConfigEntry<bool> _configServerSync = null!;
 
-        internal static ConfigEntry<bool>? _configUseAutoRemoveTombstone = null!;
-        internal static ConfigEntry<bool>? _configUseRemoveNearby = null!;
-        internal static ConfigEntry<KeyCode>? _configKeyRemoveNearby = null!;
-        internal static ConfigEntry<KeyCode>? _configModifierRemoveNearby = null!;
-        internal static ConfigEntry<bool>? _configUseRemoveNearbyBeds = null!;
-        internal static ConfigEntry<bool>? _configUseRemoveNearbyTombstone = null!;
-        internal static ConfigEntry<int>? _configRemoveNearbyRadius = null!;
-        internal static ConfigEntry<bool>? _configUseAddAtLocation = null!;
-        internal static ConfigEntry<KeyCode>? _configKeyAddAtLocation = null!;
-        internal static ConfigEntry<KeyCode>? _configModifierAddAtLocation = null!;
+        //internal static ConfigEntry<bool>? _configUseAutoRemoveTombstone = null!;
+        //internal static ConfigEntry<bool>? _configUseRemoveNearby = null!;
+        //internal static ConfigEntry<KeyCode>? _configKeyRemoveNearby = null!;
+        //internal static ConfigEntry<KeyCode>? _configModifierRemoveNearby = null!;
+        //internal static ConfigEntry<bool>? _configUseRemoveNearbyBeds = null!;
+        //internal static ConfigEntry<bool>? _configUseRemoveNearbyTombstone = null!;
+        //internal static ConfigEntry<int>? _configRemoveNearbyRadius = null!;
+        //internal static ConfigEntry<bool>? _configUseAddAtLocation = null!;
+        //internal static ConfigEntry<KeyCode>? _configKeyAddAtLocation = null!;
+        //internal static ConfigEntry<KeyCode>? _configModifierAddAtLocation = null!;
 
         internal static ConfigEntry<string>? _fileCompass = null!;
         internal static ConfigEntry<string>? _fileOverlay = null!;
