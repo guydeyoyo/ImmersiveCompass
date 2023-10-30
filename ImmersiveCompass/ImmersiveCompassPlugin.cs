@@ -21,9 +21,9 @@ namespace ImmersiveCompass
     {
         #region Variables
         internal const string PLUGIN_NAME = "ImmersiveCompass";
-        internal const string PLUGIN_VERSION = "1.1.3";
+        internal const string PLUGIN_VERSION = "1.3.1";
         internal const string PLUGIN_GUID = "Yoyo." + PLUGIN_NAME;
-        internal const string PLUGIN_AUTHOR = "GuyDeYoyo";
+        internal const string PLUGIN_AUTHOR = "gdragon";
 
         private static string ConfigFileName = PLUGIN_GUID + ".cfg";
         private static string ConfigFileFullPath = Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
@@ -532,8 +532,10 @@ namespace ImmersiveCompass
                 _angle *= -Mathf.Deg2Rad;
 
                 Rect _rectCompass = _objectCompass.GetComponent<Image>().sprite.rect;
-                //float _imageScale = GameObject.Find("LoadingGUI").GetComponent<CanvasScaler>().scaleFactor;
-                float _imageScale = GuiScaler.m_largeGuiScale;
+
+                float _imageScale = 1;
+                CanvasScaler cs = GuiScaler.m_scalers?.Find(x => x.m_canvasScaler.name == "LoadingGUI")?.m_canvasScaler;
+                if (cs != null) _imageScale = cs.scaleFactor;
 
                 _objectCompass.GetComponent<RectTransform>().localPosition = Vector3.right * (_rectCompass.width / 2) * _angle / (2f * Mathf.PI) - new Vector3(_rectCompass.width * 0.125f, 0, 0);
 
@@ -546,6 +548,7 @@ namespace ImmersiveCompass
                     _objectCenterMark.GetComponent<Image>().color = _colorCenterMark.Value;
                     _objectCenterMark.SetActive(true);
                 }
+
 
                 int count = _objectPins.transform.childCount;
                 List<string> __oldPins = new List<string>();
