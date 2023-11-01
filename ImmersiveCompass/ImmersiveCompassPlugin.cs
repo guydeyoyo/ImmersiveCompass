@@ -22,7 +22,7 @@ namespace ImmersiveCompass
     {
         #region Variables
         internal const string PLUGIN_NAME = "ImmersiveCompass";
-        internal const string PLUGIN_VERSION = "1.3.1";
+        internal const string PLUGIN_VERSION = "1.3.2";
         internal const string PLUGIN_GUID = "Yoyo." + PLUGIN_NAME;
         internal const string PLUGIN_AUTHOR = "gdragon";
 
@@ -76,18 +76,18 @@ namespace ImmersiveCompass
             _scalePinsMin = config("2 - Compass Display", "Minimum Pin Size", 0.25f, "Enlarge or shrink the scale of the pins at their furthest visible distance.", false);
             _compassShowCenterMark = config("2 - Compass Display", "Show Center Mark", false, "(Optional) Show center mark graphic.", false);
 
-            _ignoredPinNames = config("6 - Ignore", "Pin Names", "Silver,Obsidian,Copper,Tin", "Ignore location pins with these names (comma separated, no spaces). End a string with asterix * to denote a prefix.", true);
-            _ignoredPinTypes = config("6 - Ignore", "Pin Types", "Shout,Ping", "Ignore location pins of these types (comma separated, no spaces). Types include: Icon0,Icon1,Icon2,Icon3,Icon4,Death,Bed,Shout,None,Boss,Player,RandomEvent,Ping,EventArea.", true);
+            _ignoredPinNames = config("3 - Ignore", "Pin Names", "Silver,Obsidian,Copper,Tin", "Ignore location pins with these names (comma separated, no spaces). End a string with asterix * to denote a prefix.", true);
+            _ignoredPinTypes = config("3 - Ignore", "Pin Types", "Shout,Ping", "Ignore location pins of these types (comma separated, no spaces). Types include: Icon0,Icon1,Icon2,Icon3,Icon4,Death,Bed,Shout,None,Boss,Player,RandomEvent,Ping,EventArea.", true);
 
-            _fileCompass = config("7 - File System", "Compass", "compass.png", "Image file located in mod folder to use for compass overlay.", false);
-            _fileMask = config("7 - File System", "Mask", "mask.png", "Image file located in mod folder to use as compass mask.", false);
-            _fileOverlay = config("7 - File System", "Overlay", "", "(Optional) Image file located in mod folder to display on top the compass (eg. a decorative frame).", false);
-            _fileUnderlay = config("7 - File System", "Underlay", "", "(Optional) Image file located in mod folder to display below the compass (eg. a decorative frame).", false);
-            _fileCenter = config("7 - File System", "Center Mark", "center.png", "(Optional) Image file located in mod folder to display at center of compass (eg. a line).", false);
+            _fileCompass = config("4 - File System", "Compass", "compass.png", "Image file located in mod folder to use for compass overlay.", false);
+            _fileMask = config("4 - File System", "Mask", "mask.png", "Image file located in mod folder to use as compass mask.", false);
+            _fileOverlay = config("4 - File System", "Overlay", "", "(Optional) Image file located in mod folder to display on top the compass (eg. a decorative frame).", false);
+            _fileUnderlay = config("4 - File System", "Underlay", "", "(Optional) Image file located in mod folder to display below the compass (eg. a decorative frame).", false);
+            _fileCenter = config("4 - File System", "Center Mark", "center.png", "(Optional) Image file located in mod folder to display at center of compass (eg. a line).", false);
 
-            _colorCompass = config("8 - Color Adjustment", "Color (Compass)", Color.white, "(Optional) Adjust the color of the compass.", false);
-            _colorPins = config("8 - Color Adjustment", "Color (Pins)", Color.white, "(Optional) Adjust the color of the location pins.", false);
-            _colorCenterMark = config("8 - Color Adjustment", "Color (Center Mark)", Color.yellow, "(Optional) Adjust the color of the center mark graphic.", false);
+            _colorCompass = config("5 - Color Adjustment", "Color (Compass)", Color.white, "(Optional) Adjust the color of the compass.", false);
+            _colorPins = config("5 - Color Adjustment", "Color (Pins)", Color.white, "(Optional) Adjust the color of the location pins.", false);
+            _colorCenterMark = config("5 - Color Adjustment", "Color (Center Mark)", Color.yellow, "(Optional) Adjust the color of the center mark graphic.", false);
 
             configSync.AddLockingConfigEntry(_configServerSync);
             #endregion Configuration
@@ -525,17 +525,6 @@ namespace ImmersiveCompass
         #nullable enable
         internal static ConfigEntry<bool> _configEnabled = null!;
         internal static ConfigEntry<bool> _configServerSync = null!;
-
-        //internal static ConfigEntry<bool>? _configUseAutoRemoveTombstone = null!;
-        //internal static ConfigEntry<bool>? _configUseRemoveNearby = null!;
-        //internal static ConfigEntry<KeyCode>? _configKeyRemoveNearby = null!;
-        //internal static ConfigEntry<KeyCode>? _configModifierRemoveNearby = null!;
-        //internal static ConfigEntry<bool>? _configUseRemoveNearbyBeds = null!;
-        //internal static ConfigEntry<bool>? _configUseRemoveNearbyTombstone = null!;
-        //internal static ConfigEntry<int>? _configRemoveNearbyRadius = null!;
-        //internal static ConfigEntry<bool>? _configUseAddAtLocation = null!;
-        //internal static ConfigEntry<KeyCode>? _configKeyAddAtLocation = null!;
-        //internal static ConfigEntry<KeyCode>? _configModifierAddAtLocation = null!;
 
         internal static ConfigEntry<string>? _fileCompass = null!;
         internal static ConfigEntry<string>? _fileOverlay = null!;
